@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Minecraft Block Quiz</title>
+  <!-- Press Start 2P font from Google Fonts — not created by student -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #1c1c1c;
+      background-image:
+        repeating-linear-gradient(0deg,   transparent, transparent 31px, #111 31px, #111 32px),
+        repeating-linear-gradient(90deg,  transparent, transparent 31px, #111 31px, #111 32px);
+      font-family: 'Press Start 2P', monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .card {
+      background: #3b3b3b;
+      border: 4px solid #888;
+      box-shadow: inset 0 0 0 2px #222, 6px 6px 0 #000;
+      padding: 28px 24px;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 13px;
+      color: #5dff5d;
+      text-shadow: 2px 2px #004400;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    #lblProgress {
+      font-size: 8px;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    #lblQuestion {
+      font-size: 9px;
+      color: #fff;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    #imgBlock {
+      display: block;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 20px;
+      image-rendering: pixelated;
+      border: 4px solid #666;
+      box-shadow: 3px 3px 0 #000;
+      background: #555;
+    }
+
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .choice-btn {
+      background: #5a7c3a;
+      color: #fff;
+      border: 3px solid #8ab85a;
+      box-shadow: 3px 3px 0 #000;
+      padding: 12px 6px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 7px;
+      line-height: 1.6;
+      cursor: pointer;
+      transition: background 0.1s, transform 0.1s;
+    }
+    .choice-btn:hover  { background: #6f9e4a; }
+    .choice-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+
+    /* feedback flash */
+    .choice-btn.correct { background: #2a8a2a; border-color: #5dff5d; }
+    .choice-btn.wrong   { background: #8a2a2a; border-color: #ff5d5d; }
+
+    #scoreBar {
+      font-size: 7px;
+      color: #ffdd44;
+      text-shadow: 1px 1px #664400;
+    }
+
+    /* Results screen */
+    #resultsScreen { display: none; }
+
+    #lblScore {
+      font-size: 11px;
+      color: #5dff5d;
+      text-shadow: 2px 2px #004400;
+      margin: 16px 0 10px;
+      line-height: 1.8;
+    }
+
+    #lblFeedback {
+      font-size: 8px;
+      color: #fff;
+      line-height: 1.8;
+      margin-bottom: 24px;
+    }
+
+    .restart-btn {
+      background: #7a4a1e;
+      color: #fff;
+      border: 3px solid #c47a3e;
+      box-shadow: 3px 3px 0 #000;
+      padding: 14px 20px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 8px;
+      cursor: pointer;
+      transition: background 0.1s, transform 0.1s;
+    }
+    .restart-btn:hover  { background: #9a6a2e; }
+    .restart-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+  </style>
+</head>
+<body>
+<div class="card">
+
+  <!-- QUIZ SCREEN -->
+  <div id="quizScreen">
+    <h1>MINECRAFT<br>BLOCK QUIZ</h1>
+    <p id="lblProgress"></p>
+    <p id="lblQuestion"></p>
+    <img id="imgBlock" src="" alt="Mystery Block">
+    <div class="choices">
+      <button class="choice-btn" id="btnA" onclick="handleAnswer(0)"></button>
+      <button class="choice-btn" id="btnB" onclick="handleAnswer(1)"></button>
+      <button class="choice-btn" id="btnC" onclick="handleAnswer(2)"></button>
+      <button class="choice-btn" id="btnD" onclick="handleAnswer(3)"></button>
+    </div>
+    <p id="scoreBar"></p>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="resultsScreen">
+    <h1>RESULTS!</h1>
+    <p id="lblScore"></p>
+    <p id="lblFeedback"></p>
+    <button class="restart-btn" onclick="restartQuiz()">PLAY AGAIN</button>
+  </div>
+
+</div>
+
+<script>
+  // ============================================================
+  // MINECRAFT BLOCK QUIZ — AP CSP Survival Guide
+  // ============================================================
+  // Block textures: InventivetalentDev/minecraft-assets on GitHub
+  // (https://github.com/InventivetalentDev/minecraft-assets)
+  // Font: Press Start 2P via Google Fonts (https://fonts.google.com)
+  // These assets were NOT created by the student.
+  // ============================================================
+
+  // Base URL for Minecraft block textures — external, not created by student
+  var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.4/assets/minecraft/textures/block/";
+
+  // ---- DATA STRUCTURE: list of quiz questions ----
+  var questions = [
+    {
+      question: "What block is this?",
+      imgUrl: BASE + "oak_planks.png",
+      choices: ["Oak Log", "Oak Planks", "Spruce Planks", "Oak Stairs"],
+      answer: 1
+    },
+    {
+      question: "What block is this?",
+      imgUrl: BASE + "cobblestone.png",
+      choices: ["Stone Bricks", "Cobblestone", "Mossy Cobblestone", "Andesite"],
+      answer: 1
+    },
+    {
+      question: "What block is this?",
+      imgUrl: BASE + "dirt.png",
+      choices: ["Gravel", "Coarse Dirt", "Sand", "Dirt"],
+      answer: 3
+    },
+    {
+      question: "What block is this?",
+      imgUrl: BASE + "sand.png",
+      choices: ["Sandstone", "Soul Sand", "Sand", "Gravel"],
+      answer: 2
+    },
+    {
+      question: "What block is this?",
+      imgUrl: BASE + "stone.png",
+      choices: ["Diorite", "Andesite", "Cobblestone", "Stone"],
+      answer: 3
+    }
+  ];
+
+  var currentQ   = 0;   // tracks which question we are on
+  var userAnswers = [];  // list that stores the player's selected answer indexes
+  var answered   = false; // prevents double-clicking
+
+  // ---- REQUIRED FUNCTION: parameter + if-statement + loop ----
+  // Counts how many entries in answerList match the correct answers
+  function countCorrect(answerList) {
+    var score = 0;
+    for (var i = 0; i < answerList.length; i++) {
+      if (answerList[i] === questions[i].answer) {
+        score = score + 1;
+      }
+    }
+    return score;
+  }
+
+  // ---- Load a question onto the screen (OUTPUT) ----
+  function loadQuestion(qIndex) {
+    answered = false;
+    var q = questions[qIndex];
+    document.getElementById("lblProgress").textContent =
+      "Question " + (qIndex + 1) + " of " + questions.length;
+    document.getElementById("lblQuestion").textContent = q.question;
+    document.getElementById("imgBlock").src = q.imgUrl;
+
+    var btns = ["btnA", "btnB", "btnC", "btnD"];
+    for (var i = 0; i < btns.length; i++) {
+      var btn = document.getElementById(btns[i]);
+      btn.textContent = q.choices[i];
+      btn.className = "choice-btn";
+    }
+
+    document.getElementById("scoreBar").textContent =
+      "Score: " + countCorrect(userAnswers) + " / " + questions.length;
+  }
+
+  // ---- Called when the player clicks an answer button (INPUT) ----
+  function handleAnswer(choiceIndex) {
+    if (answered) return;  // block extra clicks during flash
+    answered = true;
+
+    var correct = questions[currentQ].answer;
+    var btnIds  = ["btnA", "btnB", "btnC", "btnD"];
+
+    // Flash green/red feedback
+    document.getElementById(btnIds[choiceIndex]).className +=
+      (choiceIndex === correct ? " correct" : " wrong");
+    document.getElementById(btnIds[correct]).className += " correct";
+
+    userAnswers.push(choiceIndex);  // add choice to list
+
+    // Wait 700ms so the player can see the feedback, then move on
+    setTimeout(function() {
+      currentQ = currentQ + 1;
+      if (currentQ < questions.length) {
+        loadQuestion(currentQ);
+      } else {
+        showResults();
+      }
+    }, 700);
+  }
+
+  // ---- Show the results screen (OUTPUT) ----
+  function showResults() {
+    var score = countCorrect(userAnswers);
+    document.getElementById("quizScreen").style.display   = "none";
+    document.getElementById("resultsScreen").style.display = "block";
+
+    document.getElementById("lblScore").textContent =
+      "You got " + score + " out of " + questions.length + " correct!";
+
+    var msg;
+    if (score === 5) {
+      msg = "Perfect score!\nYou are a Minecraft master!";
+    } else if (score >= 3) {
+      msg = "Nice work!\nYou know your blocks!";
+    } else {
+      msg = "Keep practicing!\nTry again!";
+    }
+    document.getElementById("lblFeedback").textContent = msg;
+  }
+
+  // ---- Restart the quiz ----
+  function restartQuiz() {
+    currentQ    = 0;
+    userAnswers = [];
+    document.getElementById("resultsScreen").style.display = "none";
+    document.getElementById("quizScreen").style.display    = "block";
+    loadQuestion(0);
+  }
+
+  // ---- Start ----
+  loadQuestion(0);
+</script>
+</body>
+</html>
