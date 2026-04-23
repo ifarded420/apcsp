@@ -1,39 +1,44 @@
 // ============================================================
 // MINECRAFT BLOCK QUIZ — AP CSP Survival Guide
 // ============================================================
-// Images sourced from the Minecraft Wiki (https://minecraft.wiki)
+// Block texture images from:
+// InventivetalentDev/minecraft-assets on GitHub
+// (https://github.com/InventivetalentDev/minecraft-assets)
 // These images were NOT created by the student.
 // ============================================================
+
+// Base URL for all block textures (not created by student — see citation above)
+var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.4/assets/minecraft/textures/block/";
 
 // ---- DATA STRUCTURE: list of 5 quiz questions ----
 var questions = [
   {
     question: "What block is this?",
-    imgUrl: "https://minecraft.wiki/images/Oak_Planks_JE4.png",
+    imgUrl: BASE + "oak_planks.png",
     choices: ["Oak Log", "Oak Planks", "Spruce Planks", "Oak Stairs"],
     answer: 1
   },
   {
     question: "What block is this?",
-    imgUrl: "https://minecraft.wiki/images/Cobblestone_JE6.png",
+    imgUrl: BASE + "cobblestone.png",
     choices: ["Stone Bricks", "Cobblestone", "Mossy Cobblestone", "Andesite"],
     answer: 1
   },
   {
     question: "What block is this?",
-    imgUrl: "https://minecraft.wiki/images/Dirt_JE2.png",
+    imgUrl: BASE + "dirt.png",
     choices: ["Gravel", "Coarse Dirt", "Sand", "Dirt"],
     answer: 3
   },
   {
     question: "What block is this?",
-    imgUrl: "https://minecraft.wiki/images/Sand_JE3.png",
+    imgUrl: BASE + "sand.png",
     choices: ["Sandstone", "Soul Sand", "Sand", "Gravel"],
     answer: 2
   },
   {
     question: "What block is this?",
-    imgUrl: "https://minecraft.wiki/images/Stone_JE4.png",
+    imgUrl: BASE + "stone.png",
     choices: ["Diorite", "Andesite", "Cobblestone", "Stone"],
     answer: 3
   }
