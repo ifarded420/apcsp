@@ -60,17 +60,7 @@ function countCorrect(answerList) {
   return score;
 }
 
-// ---- Wipe any elements left over from a previous run ----
-// On first run these warn (elements don't exist yet) — harmless.
-// On every run after that, elements exist and delete cleanly — no warnings.
-var allIds = ["lblTitle", "lblProgress", "imgBlock",
-              "btnA", "btnB", "btnC", "btnD",
-              "lblScoreBar", "lblFinalScore", "lblFeedback", "btnRestart"];
-for (var d = 0; d < allIds.length; d++) {
-  deleteElement(allIds[d]);
-}
-
-// ---- Build UI fresh ----
+// ---- Build UI ----
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
 setPosition("lblTitle", 0, 10, 320, 25);
