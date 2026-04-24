@@ -60,6 +60,14 @@ function countCorrect(answerList) {
   return score;
 }
 
+// ---- Delete leftovers from any previous run to prevent duplicate elements ----
+var allIds = ["lblTitle", "lblProgress", "imgBlock",
+              "btnA", "btnB", "btnC", "btnD",
+              "lblScoreBar", "lblFinalScore", "lblFeedback", "btnRestart"];
+for (var d = 0; d < allIds.length; d++) {
+  deleteElement(allIds[d]);
+}
+
 // ---- Build UI ----
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
