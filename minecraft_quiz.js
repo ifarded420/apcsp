@@ -61,6 +61,8 @@ function countCorrect(answerList) {
 }
 
 // ---- Build UI with App Lab functions ----
+// NOTE: "already exists" warnings below only appear on re-runs because
+// App Lab keeps elements alive between runs. They are harmless.
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
 setPosition("lblTitle", 0, 10, 320, 25);
@@ -115,9 +117,8 @@ function loadQuestion(qIndex) {
   var q = questions[qIndex];
   setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
 
-  // Re-call image() with the new URL to update the displayed block
-  image("imgBlock", q.imgUrl);
-  setPosition("imgBlock", 80, 65, 160, 160);
+  // Update the block image URL using setProperty
+  setProperty("imgBlock", "src", q.imgUrl);
 
   setText("btnA", q.choices[0]);
   setText("btnB", q.choices[1]);
