@@ -60,19 +60,6 @@ function countCorrect(answerList) {
   return score;
 }
 
-// ---- Clear any leftover elements from a previous run ----
-deleteElement("lblTitle");
-deleteElement("lblProgress");
-deleteElement("imgBlock");
-deleteElement("btnA");
-deleteElement("btnB");
-deleteElement("btnC");
-deleteElement("btnD");
-deleteElement("lblScoreBar");
-deleteElement("lblFinalScore");
-deleteElement("lblFeedback");
-deleteElement("btnRestart");
-
 // ---- Build UI with App Lab functions ----
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
@@ -85,7 +72,9 @@ setPosition("lblProgress", 0, 40, 320, 20);
 setProperty("lblProgress", "font-size", 11);
 setProperty("lblProgress", "text-align", "center");
 
-// imgBlock is created fresh each question inside loadQuestion()
+// Create imgBlock once here; loadQuestion() updates the URL by re-calling image()
+image("imgBlock", "");
+setPosition("imgBlock", 80, 65, 160, 160);
 
 button("btnA", "");
 setPosition("btnA", 10, 235, 145, 50);
@@ -126,8 +115,7 @@ function loadQuestion(qIndex) {
   var q = questions[qIndex];
   setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
 
-  // Delete and recreate the image so the URL updates correctly
-  deleteElement("imgBlock");
+  // Re-call image() with the new URL to update the displayed block
   image("imgBlock", q.imgUrl);
   setPosition("imgBlock", 80, 65, 160, 160);
 
