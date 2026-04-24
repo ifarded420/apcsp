@@ -3,143 +3,13 @@
 // ============================================================
 // Block textures: InventivetalentDev/minecraft-assets on GitHub
 //   https://github.com/InventivetalentDev/minecraft-assets
-// Font: Press Start 2P via Google Fonts
-//   https://fonts.google.com/specimen/Press+Start+2P
-// These assets were NOT created by the student.
+// These images were NOT created by the student.
 // ============================================================
 
-// ---- Load pixel font ----
-var fontLink = document.createElement("link");
-fontLink.rel  = "stylesheet";
-fontLink.href = "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap";
-document.head.appendChild(fontLink);
-
-// ---- Inject all styles ----
-var style = document.createElement("style");
-style.textContent = [
-  "* { box-sizing:border-box; margin:0; padding:0; }",
-  "body {",
-  "  background:#1c1c1c;",
-  "  background-image:",
-  "    repeating-linear-gradient(0deg,  transparent,transparent 31px,#111 31px,#111 32px),",
-  "    repeating-linear-gradient(90deg, transparent,transparent 31px,#111 31px,#111 32px);",
-  "  font-family:'Press Start 2P',monospace;",
-  "  display:flex; justify-content:center; align-items:center;",
-  "  min-height:100vh; padding:20px; color:#fff;",
-  "}",
-  ".card {",
-  "  background:#3b3b3b; border:4px solid #888;",
-  "  box-shadow:inset 0 0 0 2px #222, 6px 6px 0 #000;",
-  "  padding:28px 24px; max-width:480px; width:100%; text-align:center;",
-  "}",
-  "h1  { font-size:13px; color:#5dff5d; text-shadow:2px 2px #004400;",
-  "      letter-spacing:1px; margin-bottom:18px; line-height:1.6; }",
-  "#lblProgress { font-size:8px; color:#aaa; margin-bottom:10px; }",
-  "#lblQuestion  { font-size:9px; color:#fff; margin-bottom:16px; line-height:1.8; }",
-  "#imgBlock {",
-  "  display:block; width:160px; height:160px; margin:0 auto 20px;",
-  "  image-rendering:pixelated; border:4px solid #666;",
-  "  box-shadow:3px 3px 0 #000; background:#555;",
-  "}",
-  ".choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }",
-  ".btn {",
-  "  background:#5a7c3a; color:#fff; border:3px solid #8ab85a;",
-  "  box-shadow:3px 3px 0 #000; padding:12px 6px;",
-  "  font-family:'Press Start 2P',monospace; font-size:7px;",
-  "  line-height:1.6; cursor:pointer; transition:background .1s,transform .1s;",
-  "}",
-  ".btn:hover  { background:#6f9e4a; }",
-  ".btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 #000; }",
-  ".btn.correct { background:#2a8a2a; border-color:#5dff5d; }",
-  ".btn.wrong   { background:#8a2a2a; border-color:#ff5d5d; }",
-  "#scoreBar { font-size:7px; color:#ffdd44; text-shadow:1px 1px #664400; }",
-  "#lblScore    { font-size:11px; color:#5dff5d; text-shadow:2px 2px #004400;",
-  "               margin:16px 0 10px; line-height:1.8; }",
-  "#lblFeedback { font-size:8px; color:#fff; line-height:1.8; margin-bottom:24px; }",
-  ".restart-btn {",
-  "  background:#7a4a1e; color:#fff; border:3px solid #c47a3e;",
-  "  box-shadow:3px 3px 0 #000; padding:14px 20px;",
-  "  font-family:'Press Start 2P',monospace; font-size:8px; cursor:pointer;",
-  "  transition:background .1s,transform .1s;",
-  "}",
-  ".restart-btn:hover  { background:#9a6a2e; }",
-  ".restart-btn:active { transform:translate(2px,2px); box-shadow:1px 1px 0 #000; }"
-].join("\n");
-document.head.appendChild(style);
-
-// ---- Build the DOM ----
-var card = document.createElement("div");
-card.className = "card";
-document.body.appendChild(card);
-
-// -- Quiz screen --
-var quizScreen = document.createElement("div");
-quizScreen.id = "quizScreen";
-card.appendChild(quizScreen);
-
-var title = document.createElement("h1");
-title.textContent = "MINECRAFT\nBLOCK QUIZ";
-quizScreen.appendChild(title);
-
-var lblProgress = document.createElement("p");
-lblProgress.id = "lblProgress";
-quizScreen.appendChild(lblProgress);
-
-var lblQuestion = document.createElement("p");
-lblQuestion.id = "lblQuestion";
-quizScreen.appendChild(lblQuestion);
-
-var imgBlock = document.createElement("img");
-imgBlock.id  = "imgBlock";
-imgBlock.alt = "Mystery Block";
-quizScreen.appendChild(imgBlock);
-
-var choicesDiv = document.createElement("div");
-choicesDiv.className = "choices";
-quizScreen.appendChild(choicesDiv);
-
-var choiceBtns = [];
-for (var b = 0; b < 4; b++) {
-  var btn = document.createElement("button");
-  btn.className = "btn";
-  btn.dataset.index = b;
-  choicesDiv.appendChild(btn);
-  choiceBtns.push(btn);
-}
-
-var scoreBar = document.createElement("p");
-scoreBar.id = "scoreBar";
-quizScreen.appendChild(scoreBar);
-
-// -- Results screen --
-var resultsScreen = document.createElement("div");
-resultsScreen.id = "resultsScreen";
-resultsScreen.style.display = "none";
-card.appendChild(resultsScreen);
-
-var resTitle = document.createElement("h1");
-resTitle.textContent = "RESULTS!";
-resultsScreen.appendChild(resTitle);
-
-var lblScore = document.createElement("p");
-lblScore.id = "lblScore";
-resultsScreen.appendChild(lblScore);
-
-var lblFeedback = document.createElement("p");
-lblFeedback.id = "lblFeedback";
-resultsScreen.appendChild(lblFeedback);
-
-var restartBtn = document.createElement("button");
-restartBtn.className  = "restart-btn";
-restartBtn.textContent = "PLAY AGAIN";
-resultsScreen.appendChild(restartBtn);
-
-// ============================================================
-// DATA STRUCTURE: list of 5 quiz questions
-// ============================================================
-// Base URL for Minecraft block textures — not created by student (see citation above)
+// Base URL for block textures — external asset, not created by student
 var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.4/assets/minecraft/textures/block/";
 
+// ---- DATA STRUCTURE: list of 5 quiz questions ----
 var questions = [
   {
     question: "What block is this?",
@@ -175,7 +45,6 @@ var questions = [
 
 var currentQ    = 0;
 var userAnswers = [];  // list storing player's selected answer indexes
-var answered    = false;
 
 // ============================================================
 // REQUIRED FUNCTION: has a parameter, if-statement, and a loop
@@ -191,76 +60,134 @@ function countCorrect(answerList) {
   return score;
 }
 
-// ---- Load a question onto the screen (OUTPUT) ----
+// ---- Build UI with App Lab functions ----
+
+// Title
+textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
+setPosition("lblTitle", 0, 10, 320, 25);
+setProperty("lblTitle", "font-size", "14px");
+setProperty("lblTitle", "text-align", "center");
+setProperty("lblTitle", "font-weight", "bold");
+
+// Progress line
+textLabel("lblProgress", "");
+setPosition("lblProgress", 0, 40, 320, 20);
+setProperty("lblProgress", "font-size", "11px");
+setProperty("lblProgress", "text-align", "center");
+
+// Block image (OUTPUT)
+image("imgBlock", "");
+setPosition("imgBlock", 80, 65, 160, 160);
+
+// Answer buttons (INPUT) — 2x2 grid
+button("btnA", "");
+setPosition("btnA", 10, 235, 145, 50);
+
+button("btnB", "");
+setPosition("btnB", 165, 235, 145, 50);
+
+button("btnC", "");
+setPosition("btnC", 10, 295, 145, 50);
+
+button("btnD", "");
+setPosition("btnD", 165, 295, 145, 50);
+
+// Running score bar
+textLabel("lblScoreBar", "Score: 0 / 5");
+setPosition("lblScoreBar", 0, 355, 320, 20);
+setProperty("lblScoreBar", "font-size", "11px");
+setProperty("lblScoreBar", "text-align", "center");
+
+// ---- Results elements (hidden until quiz ends) ----
+textLabel("lblFinalScore", "");
+setPosition("lblFinalScore", 0, 130, 320, 40);
+setProperty("lblFinalScore", "font-size", "13px");
+setProperty("lblFinalScore", "text-align", "center");
+setProperty("lblFinalScore", "font-weight", "bold");
+hideElement("lblFinalScore");
+
+textLabel("lblFeedback", "");
+setPosition("lblFeedback", 0, 185, 320, 50);
+setProperty("lblFeedback", "font-size", "11px");
+setProperty("lblFeedback", "text-align", "center");
+hideElement("lblFeedback");
+
+button("btnRestart", "PLAY AGAIN");
+setPosition("btnRestart", 85, 250, 150, 50);
+hideElement("btnRestart");
+
+// ---- Load a question onto the screen ----
 function loadQuestion(qIndex) {
-  answered = false;
   var q = questions[qIndex];
-
-  lblProgress.textContent = "Question " + (qIndex + 1) + " of " + questions.length;
-  lblQuestion.textContent = q.question;
-  imgBlock.src = q.imgUrl;
-
-  for (var i = 0; i < choiceBtns.length; i++) {
-    choiceBtns[i].textContent = q.choices[i];
-    choiceBtns[i].className   = "btn";
-  }
-
-  scoreBar.textContent = "Score: " + countCorrect(userAnswers) + " / " + questions.length;
+  setText("lblProgress", "Question " + (qIndex + 1) + " of " + questions.length + " — " + q.question);
+  setProperty("imgBlock", "image-url", q.imgUrl);
+  setText("btnA", q.choices[0]);
+  setText("btnB", q.choices[1]);
+  setText("btnC", q.choices[2]);
+  setText("btnD", q.choices[3]);
+  setText("lblScoreBar", "Score: " + countCorrect(userAnswers) + " / " + questions.length);
 }
 
-// ---- Handle a player's answer click (INPUT) ----
+// ---- Handle an answer button click (INPUT) ----
 function handleAnswer(choiceIndex) {
-  if (answered) return;
-  answered = true;
-
-  var correct = questions[currentQ].answer;
-
-  choiceBtns[choiceIndex].className += (choiceIndex === correct ? " correct" : " wrong");
-  choiceBtns[correct].className += " correct";
-
-  userAnswers.push(choiceIndex);  // store choice in the list
-
-  setTimeout(function() {
-    currentQ = currentQ + 1;
-    if (currentQ < questions.length) {
-      loadQuestion(currentQ);
-    } else {
-      showResults();
-    }
-  }, 700);
+  userAnswers.push(choiceIndex);  // add choice to list
+  currentQ = currentQ + 1;
+  if (currentQ < questions.length) {
+    loadQuestion(currentQ);
+  } else {
+    showResults();
+  }
 }
 
-// ---- Show final results screen (OUTPUT) ----
+// ---- Show final results (OUTPUT) ----
 function showResults() {
-  var score = countCorrect(userAnswers);
-  quizScreen.style.display    = "none";
-  resultsScreen.style.display = "block";
+  // Hide quiz elements
+  hideElement("imgBlock");
+  hideElement("btnA");
+  hideElement("btnB");
+  hideElement("btnC");
+  hideElement("btnD");
+  hideElement("lblScoreBar");
+  hideElement("lblProgress");
 
-  lblScore.textContent = "You got " + score + " out of " + questions.length + " correct!";
+  // Show results elements
+  var score = countCorrect(userAnswers);
+  setText("lblFinalScore", "You got " + score + " out of " + questions.length + " correct!");
 
   if (score === 5) {
-    lblFeedback.textContent = "Perfect score! You are a Minecraft master!";
+    setText("lblFeedback", "Perfect score! You are a Minecraft master!");
   } else if (score >= 3) {
-    lblFeedback.textContent = "Nice work! You know your blocks!";
+    setText("lblFeedback", "Nice work! You know your blocks!");
   } else {
-    lblFeedback.textContent = "Keep practicing! Try again!";
+    setText("lblFeedback", "Keep practicing! Try again!");
   }
+
+  showElement("lblFinalScore");
+  showElement("lblFeedback");
+  showElement("btnRestart");
 }
 
-// ---- Wire up button clicks ----
-for (var c = 0; c < choiceBtns.length; c++) {
-  (function(index) {
-    choiceBtns[index].addEventListener("click", function() { handleAnswer(index); });
-  })(c);
-}
+// ---- Button event listeners ----
+onEvent("btnA", "click", function() { handleAnswer(0); });
+onEvent("btnB", "click", function() { handleAnswer(1); });
+onEvent("btnC", "click", function() { handleAnswer(2); });
+onEvent("btnD", "click", function() { handleAnswer(3); });
 
-restartBtn.addEventListener("click", function() {
+onEvent("btnRestart", "click", function() {
   currentQ    = 0;
   userAnswers = [];
-  quizScreen.style.display    = "block";
-  resultsScreen.style.display = "none";
+  showElement("imgBlock");
+  showElement("btnA");
+  showElement("btnB");
+  showElement("btnC");
+  showElement("btnD");
+  showElement("lblScoreBar");
+  showElement("lblProgress");
+  hideElement("lblFinalScore");
+  hideElement("lblFeedback");
+  hideElement("btnRestart");
   loadQuestion(0);
 });
 
-// ---- Start ----
+// ---- Start the quiz ----
 loadQuestion(0);
