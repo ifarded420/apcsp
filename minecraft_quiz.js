@@ -25,33 +25,6 @@ function countCorrect(answerList) {
   return score;
 }
 
-// btnA, btnB, imgBlock are Design Mode elements — not generated here.
-// Only generate the text labels and restart button.
-deleteElement("lblQ");
-deleteElement("lblScore");
-deleteElement("lblResult");
-deleteElement("btnRestart");
-
-textLabel("lblQ", "");
-setPosition("lblQ", 0, 10, 320, 20);
-setProperty("lblQ", "font-size", 11);
-setProperty("lblQ", "text-align", "center");
-
-textLabel("lblScore", "");
-setPosition("lblScore", 0, 265, 320, 20);
-setProperty("lblScore", "font-size", 11);
-setProperty("lblScore", "text-align", "center");
-
-textLabel("lblResult", "");
-setPosition("lblResult", 0, 150, 320, 60);
-setProperty("lblResult", "font-size", 12);
-setProperty("lblResult", "text-align", "center");
-hideElement("lblResult");
-
-button("btnRestart", "PLAY AGAIN");
-setPosition("btnRestart", 85, 220, 150, 50);
-hideElement("btnRestart");
-
 function loadQuestion(i) {
   var q = questions[i];
   setText("lblQ", "Q" + (i+1) + " of " + questions.length + ": What block is this?");
