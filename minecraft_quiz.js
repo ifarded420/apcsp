@@ -8,9 +8,9 @@ var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-asset
 
 // ---- DATA STRUCTURE: list of quiz questions ----
 var questions = [
-  { imgUrl: BASE+"oak_planks.png",  choices: ["Oak Log",     "Oak Planks"],  answer: 1 },
-  { imgUrl: BASE+"cobblestone.png", choices: ["Cobblestone", "Stone"],        answer: 0 },
-  { imgUrl: BASE+"dirt.png",        choices: ["Sand",        "Dirt"],         answer: 1 }
+  { imgUrl: BASE+"oak_planks.png",  choices: ["Oak Log",     "Oak Planks"], answer: 1 },
+  { imgUrl: BASE+"cobblestone.png", choices: ["Cobblestone", "Stone"],      answer: 0 },
+  { imgUrl: BASE+"dirt.png",        choices: ["Sand",        "Dirt"],       answer: 1 }
 ];
 
 var currentQ = 0;
@@ -25,53 +25,44 @@ function countCorrect(answerList) {
   return score;
 }
 
-function createUI() {
-  textLabel("lblQ", "");
-  setPosition("lblQ", 0, 10, 320, 20);
-  setProperty("lblQ", "font-size", 11);
-  setProperty("lblQ", "text-align", "center");
+// Delete leftovers from any previous run, then rebuild fresh.
+// First run: warns elements don't exist (harmless). Every run after: clean.
+deleteElement("lblQ");
+deleteElement("imgBlock");
+deleteElement("btnA");
+deleteElement("btnB");
+deleteElement("lblScore");
+deleteElement("lblResult");
+deleteElement("btnRestart");
 
-  image("imgBlock", "");
-  setPosition("imgBlock", 80, 35, 160, 160);
+textLabel("lblQ", "");
+setPosition("lblQ", 0, 10, 320, 20);
+setProperty("lblQ", "font-size", 11);
+setProperty("lblQ", "text-align", "center");
 
-  button("btnA", "");
-  setPosition("btnA", 10, 205, 145, 50);
+image("imgBlock", "");
+setPosition("imgBlock", 80, 35, 160, 160);
 
-  button("btnB", "");
-  setPosition("btnB", 165, 205, 145, 50);
+button("btnA", "");
+setPosition("btnA", 10, 205, 145, 50);
 
-  textLabel("lblScore", "Score: 0 / 3");
-  setPosition("lblScore", 0, 265, 320, 20);
-  setProperty("lblScore", "font-size", 11);
-  setProperty("lblScore", "text-align", "center");
+button("btnB", "");
+setPosition("btnB", 165, 205, 145, 50);
 
-  textLabel("lblResult", "");
-  setPosition("lblResult", 0, 150, 320, 60);
-  setProperty("lblResult", "font-size", 12);
-  setProperty("lblResult", "text-align", "center");
-  hideElement("lblResult");
+textLabel("lblScore", "");
+setPosition("lblScore", 0, 265, 320, 20);
+setProperty("lblScore", "font-size", 11);
+setProperty("lblScore", "text-align", "center");
 
-  button("btnRestart", "PLAY AGAIN");
-  setPosition("btnRestart", 85, 220, 150, 50);
-  hideElement("btnRestart");
+textLabel("lblResult", "");
+setPosition("lblResult", 0, 150, 320, 60);
+setProperty("lblResult", "font-size", 12);
+setProperty("lblResult", "text-align", "center");
+hideElement("lblResult");
 
-  onEvent("btnA", "click", function() { handleAnswer(0); });
-  onEvent("btnB", "click", function() { handleAnswer(1); });
-  onEvent("btnRestart", "click", function() { resetAndStart(); });
-}
-
-function resetAndStart() {
-  currentQ = 0;
-  userAnswers = [];
-  showElement("lblQ");
-  showElement("imgBlock");
-  showElement("btnA");
-  showElement("btnB");
-  showElement("lblScore");
-  hideElement("lblResult");
-  hideElement("btnRestart");
-  loadQuestion(0);
-}
+button("btnRestart", "PLAY AGAIN");
+setPosition("btnRestart", 85, 220, 150, 50);
+hideElement("btnRestart");
 
 function loadQuestion(i) {
   var q = questions[i];
@@ -91,19 +82,23 @@ function handleAnswer(choice) {
     loadQuestion(currentQ);
   } else {
     var score = countCorrect(userAnswers);
-    hideElement("lblQ");
-    hideElement("imgBlock");
-    hideElement("btnA");
-    hideElement("btnB");
-    hideElement("lblScore");
-    setText("lblResult", "You got " + score + " / " + questions.length + "!\n" +
+    hideElement("lblQ"); hideElement("imgBlock");
+    hideElement("btnA"); hideElement("btnB"); hideElement("lblScore");
+    setText("lblResult", "You got " + score + " / " + questions.length + "!  " +
       (score === 3 ? "Perfect! Minecraft master!" : score === 2 ? "Nice work!" : "Keep practicing!"));
     showElement("lblResult");
     showElement("btnRestart");
   }
 }
 
-getKeyValue("quizUIBuilt", function(val) {
-  if (!val) { createUI(); setKeyValue("quizUIBuilt", true, function() {}); }
-  resetAndStart();
+onEvent("btnA", "click", function() { handleAnswer(0); });
+onEvent("btnB", "click", function() { handleAnswer(1); });
+onEvent("btnRestart", "click", function() {
+  currentQ = 0; userAnswers = [];
+  showElement("lblQ"); showElement("btnA");
+  showElement("btnB"); showElement("lblScore");
+  hideElement("lblResult"); hideElement("btnRestart");
+  loadQuestion(0);
 });
+
+loadQuestion(0);
