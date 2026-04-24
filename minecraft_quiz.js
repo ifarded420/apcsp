@@ -60,70 +60,86 @@ function countCorrect(answerList) {
   return score;
 }
 
-// ---- Delete leftovers from any previous run to prevent duplicate elements ----
-var allIds = ["lblTitle", "lblProgress", "imgBlock",
-              "btnA", "btnB", "btnC", "btnD",
-              "lblScoreBar", "lblFinalScore", "lblFeedback", "btnRestart"];
-for (var d = 0; d < allIds.length; d++) {
-  deleteElement(allIds[d]);
+// ---- Build all UI elements (runs once ever, not on every re-run) ----
+function createUI() {
+  textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
+  setPosition("lblTitle", 0, 10, 320, 25);
+  setProperty("lblTitle", "font-size", 14);
+  setProperty("lblTitle", "text-align", "center");
+
+  textLabel("lblProgress", "");
+  setPosition("lblProgress", 0, 40, 320, 20);
+  setProperty("lblProgress", "font-size", 11);
+  setProperty("lblProgress", "text-align", "center");
+
+  // imgBlock created here so loadQuestion can delete/recreate it cleanly
+  image("imgBlock", "");
+  setPosition("imgBlock", 80, 65, 160, 160);
+
+  button("btnA", "");
+  setPosition("btnA", 10, 235, 145, 50);
+
+  button("btnB", "");
+  setPosition("btnB", 165, 235, 145, 50);
+
+  button("btnC", "");
+  setPosition("btnC", 10, 295, 145, 50);
+
+  button("btnD", "");
+  setPosition("btnD", 165, 295, 145, 50);
+
+  textLabel("lblScoreBar", "Score: 0 / 5");
+  setPosition("lblScoreBar", 0, 355, 320, 20);
+  setProperty("lblScoreBar", "font-size", 11);
+  setProperty("lblScoreBar", "text-align", "center");
+
+  textLabel("lblFinalScore", "");
+  setPosition("lblFinalScore", 0, 130, 320, 40);
+  setProperty("lblFinalScore", "font-size", 13);
+  setProperty("lblFinalScore", "text-align", "center");
+  hideElement("lblFinalScore");
+
+  textLabel("lblFeedback", "");
+  setPosition("lblFeedback", 0, 185, 320, 50);
+  setProperty("lblFeedback", "font-size", 11);
+  setProperty("lblFeedback", "text-align", "center");
+  hideElement("lblFeedback");
+
+  button("btnRestart", "PLAY AGAIN");
+  setPosition("btnRestart", 85, 250, 150, 50);
+  hideElement("btnRestart");
+
+  // Wire up answer buttons (INPUT)
+  onEvent("btnA", "click", function() { handleAnswer(0); });
+  onEvent("btnB", "click", function() { handleAnswer(1); });
+  onEvent("btnC", "click", function() { handleAnswer(2); });
+  onEvent("btnD", "click", function() { handleAnswer(3); });
+  onEvent("btnRestart", "click", function() { resetAndStart(); });
 }
 
-// ---- Build UI ----
-
-textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
-setPosition("lblTitle", 0, 10, 320, 25);
-setProperty("lblTitle", "font-size", 14);
-setProperty("lblTitle", "text-align", "center");
-
-textLabel("lblProgress", "");
-setPosition("lblProgress", 0, 40, 320, 20);
-setProperty("lblProgress", "font-size", 11);
-setProperty("lblProgress", "text-align", "center");
-
-// imgBlock placeholder — loadQuestion() deletes and recreates it with the real URL
-image("imgBlock", "");
-setPosition("imgBlock", 80, 65, 160, 160);
-
-button("btnA", "");
-setPosition("btnA", 10, 235, 145, 50);
-
-button("btnB", "");
-setPosition("btnB", 165, 235, 145, 50);
-
-button("btnC", "");
-setPosition("btnC", 10, 295, 145, 50);
-
-button("btnD", "");
-setPosition("btnD", 165, 295, 145, 50);
-
-textLabel("lblScoreBar", "Score: 0 / 5");
-setPosition("lblScoreBar", 0, 355, 320, 20);
-setProperty("lblScoreBar", "font-size", 11);
-setProperty("lblScoreBar", "text-align", "center");
-
-// ---- Results elements (hidden until quiz ends) ----
-textLabel("lblFinalScore", "");
-setPosition("lblFinalScore", 0, 130, 320, 40);
-setProperty("lblFinalScore", "font-size", 13);
-setProperty("lblFinalScore", "text-align", "center");
-hideElement("lblFinalScore");
-
-textLabel("lblFeedback", "");
-setPosition("lblFeedback", 0, 185, 320, 50);
-setProperty("lblFeedback", "font-size", 11);
-setProperty("lblFeedback", "text-align", "center");
-hideElement("lblFeedback");
-
-button("btnRestart", "PLAY AGAIN");
-setPosition("btnRestart", 85, 250, 150, 50);
-hideElement("btnRestart");
+// ---- Reset state and start/restart the quiz ----
+function resetAndStart() {
+  currentQ    = 0;
+  userAnswers = [];
+  showElement("lblTitle");
+  showElement("lblProgress");
+  showElement("btnA");
+  showElement("btnB");
+  showElement("btnC");
+  showElement("btnD");
+  showElement("lblScoreBar");
+  hideElement("lblFinalScore");
+  hideElement("lblFeedback");
+  hideElement("btnRestart");
+  loadQuestion(0);
+}
 
 // ---- Load a question onto the screen ----
 function loadQuestion(qIndex) {
   var q = questions[qIndex];
   setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
 
-  // Delete and recreate image — only reliable way to change the URL in App Lab
+  // Delete and recreate image — only reliable way to swap URL in App Lab
   deleteElement("imgBlock");
   image("imgBlock", q.imgUrl);
   setPosition("imgBlock", 80, 65, 160, 160);
@@ -172,26 +188,13 @@ function showResults() {
   showElement("btnRestart");
 }
 
-// ---- Button event listeners ----
-onEvent("btnA", "click", function() { handleAnswer(0); });
-onEvent("btnB", "click", function() { handleAnswer(1); });
-onEvent("btnC", "click", function() { handleAnswer(2); });
-onEvent("btnD", "click", function() { handleAnswer(3); });
-
-onEvent("btnRestart", "click", function() {
-  currentQ    = 0;
-  userAnswers = [];
-  showElement("btnA");
-  showElement("btnB");
-  showElement("btnC");
-  showElement("btnD");
-  showElement("lblScoreBar");
-  showElement("lblProgress");
-  hideElement("lblFinalScore");
-  hideElement("lblFeedback");
-  hideElement("btnRestart");
-  loadQuestion(0);
+// ---- Entry point ----
+// getKeyValue checks if UI was already built in a previous run.
+// If yes, skip createUI so no "already exists" warnings ever appear.
+getKeyValue("quizUIBuilt", function(val) {
+  if (!val) {
+    createUI();
+    setKeyValue("quizUIBuilt", true, function() {});
+  }
+  resetAndStart();
 });
-
-// ---- Start the quiz ----
-loadQuestion(0);
