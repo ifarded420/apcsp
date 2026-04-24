@@ -1,200 +1,109 @@
 // ============================================================
 // MINECRAFT BLOCK QUIZ — AP CSP Survival Guide
-// ============================================================
-// Block textures: InventivetalentDev/minecraft-assets on GitHub
-//   https://github.com/InventivetalentDev/minecraft-assets
-// These images were NOT created by the student.
+// Block textures: InventivetalentDev/minecraft-assets (GitHub)
+// Images NOT created by the student.
 // ============================================================
 
-// Base URL for block textures — external asset, not created by student
 var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.4/assets/minecraft/textures/block/";
 
-// ---- DATA STRUCTURE: list of 5 quiz questions ----
+// ---- DATA STRUCTURE: list of quiz questions ----
 var questions = [
-  {
-    question: "What block is this?",
-    imgUrl:   BASE + "oak_planks.png",
-    choices:  ["Oak Log", "Oak Planks", "Spruce Planks", "Oak Stairs"],
-    answer:   1
-  },
-  {
-    question: "What block is this?",
-    imgUrl:   BASE + "cobblestone.png",
-    choices:  ["Stone Bricks", "Cobblestone", "Mossy Cobblestone", "Andesite"],
-    answer:   1
-  },
-  {
-    question: "What block is this?",
-    imgUrl:   BASE + "dirt.png",
-    choices:  ["Gravel", "Coarse Dirt", "Sand", "Dirt"],
-    answer:   3
-  },
-  {
-    question: "What block is this?",
-    imgUrl:   BASE + "sand.png",
-    choices:  ["Sandstone", "Soul Sand", "Sand", "Gravel"],
-    answer:   2
-  },
-  {
-    question: "What block is this?",
-    imgUrl:   BASE + "stone.png",
-    choices:  ["Diorite", "Andesite", "Cobblestone", "Stone"],
-    answer:   3
-  }
+  { imgUrl: BASE+"oak_planks.png",  choices: ["Oak Log",     "Oak Planks"],  answer: 1 },
+  { imgUrl: BASE+"cobblestone.png", choices: ["Cobblestone", "Stone"],        answer: 0 },
+  { imgUrl: BASE+"dirt.png",        choices: ["Sand",        "Dirt"],         answer: 1 }
 ];
 
-var currentQ    = 0;
-var userAnswers = [];  // list storing player's selected answer indexes
+var currentQ = 0;
+var userAnswers = [];
 
-// ============================================================
-// REQUIRED FUNCTION: has a parameter, if-statement, and a loop
-// Counts how many entries in answerList match the correct answers
-// ============================================================
+// ---- REQUIRED FUNCTION: parameter + if-statement + loop ----
 function countCorrect(answerList) {
   var score = 0;
   for (var i = 0; i < answerList.length; i++) {
-    if (answerList[i] === questions[i].answer) {
-      score = score + 1;
-    }
+    if (answerList[i] === questions[i].answer) score = score + 1;
   }
   return score;
 }
 
-// ---- Build all UI elements (runs once ever, not on every re-run) ----
 function createUI() {
-  textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
-  setPosition("lblTitle", 0, 10, 320, 25);
-  setProperty("lblTitle", "font-size", 14);
-  setProperty("lblTitle", "text-align", "center");
+  textLabel("lblQ", "");
+  setPosition("lblQ", 0, 10, 320, 20);
+  setProperty("lblQ", "font-size", 11);
+  setProperty("lblQ", "text-align", "center");
 
-  textLabel("lblProgress", "");
-  setPosition("lblProgress", 0, 40, 320, 20);
-  setProperty("lblProgress", "font-size", 11);
-  setProperty("lblProgress", "text-align", "center");
-
-  // imgBlock created here so loadQuestion can delete/recreate it cleanly
   image("imgBlock", "");
-  setPosition("imgBlock", 80, 65, 160, 160);
+  setPosition("imgBlock", 80, 35, 160, 160);
 
   button("btnA", "");
-  setPosition("btnA", 10, 235, 145, 50);
+  setPosition("btnA", 10, 205, 145, 50);
 
   button("btnB", "");
-  setPosition("btnB", 165, 235, 145, 50);
+  setPosition("btnB", 165, 205, 145, 50);
 
-  button("btnC", "");
-  setPosition("btnC", 10, 295, 145, 50);
+  textLabel("lblScore", "Score: 0 / 3");
+  setPosition("lblScore", 0, 265, 320, 20);
+  setProperty("lblScore", "font-size", 11);
+  setProperty("lblScore", "text-align", "center");
 
-  button("btnD", "");
-  setPosition("btnD", 165, 295, 145, 50);
-
-  textLabel("lblScoreBar", "Score: 0 / 5");
-  setPosition("lblScoreBar", 0, 355, 320, 20);
-  setProperty("lblScoreBar", "font-size", 11);
-  setProperty("lblScoreBar", "text-align", "center");
-
-  textLabel("lblFinalScore", "");
-  setPosition("lblFinalScore", 0, 130, 320, 40);
-  setProperty("lblFinalScore", "font-size", 13);
-  setProperty("lblFinalScore", "text-align", "center");
-  hideElement("lblFinalScore");
-
-  textLabel("lblFeedback", "");
-  setPosition("lblFeedback", 0, 185, 320, 50);
-  setProperty("lblFeedback", "font-size", 11);
-  setProperty("lblFeedback", "text-align", "center");
-  hideElement("lblFeedback");
+  textLabel("lblResult", "");
+  setPosition("lblResult", 0, 150, 320, 60);
+  setProperty("lblResult", "font-size", 12);
+  setProperty("lblResult", "text-align", "center");
+  hideElement("lblResult");
 
   button("btnRestart", "PLAY AGAIN");
-  setPosition("btnRestart", 85, 250, 150, 50);
+  setPosition("btnRestart", 85, 220, 150, 50);
   hideElement("btnRestart");
 
-  // Wire up answer buttons (INPUT)
   onEvent("btnA", "click", function() { handleAnswer(0); });
   onEvent("btnB", "click", function() { handleAnswer(1); });
-  onEvent("btnC", "click", function() { handleAnswer(2); });
-  onEvent("btnD", "click", function() { handleAnswer(3); });
   onEvent("btnRestart", "click", function() { resetAndStart(); });
 }
 
-// ---- Reset state and start/restart the quiz ----
 function resetAndStart() {
-  currentQ    = 0;
+  currentQ = 0;
   userAnswers = [];
-  showElement("lblTitle");
-  showElement("lblProgress");
+  showElement("lblQ");
+  showElement("imgBlock");
   showElement("btnA");
   showElement("btnB");
-  showElement("btnC");
-  showElement("btnD");
-  showElement("lblScoreBar");
-  hideElement("lblFinalScore");
-  hideElement("lblFeedback");
+  showElement("lblScore");
+  hideElement("lblResult");
   hideElement("btnRestart");
   loadQuestion(0);
 }
 
-// ---- Load a question onto the screen ----
-function loadQuestion(qIndex) {
-  var q = questions[qIndex];
-  setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
-
-  // Delete and recreate image — only reliable way to swap URL in App Lab
+function loadQuestion(i) {
+  var q = questions[i];
+  setText("lblQ", "Q" + (i+1) + " of " + questions.length + ": What block is this?");
   deleteElement("imgBlock");
   image("imgBlock", q.imgUrl);
-  setPosition("imgBlock", 80, 65, 160, 160);
-
+  setPosition("imgBlock", 80, 35, 160, 160);
   setText("btnA", q.choices[0]);
   setText("btnB", q.choices[1]);
-  setText("btnC", q.choices[2]);
-  setText("btnD", q.choices[3]);
-  setText("lblScoreBar", "Score: " + countCorrect(userAnswers) + " / " + questions.length);
+  setText("lblScore", "Score: " + countCorrect(userAnswers) + " / " + questions.length);
 }
 
-// ---- Handle an answer button click (INPUT) ----
-function handleAnswer(choiceIndex) {
-  userAnswers.push(choiceIndex);  // add to list
+function handleAnswer(choice) {
+  userAnswers.push(choice);
   currentQ = currentQ + 1;
   if (currentQ < questions.length) {
     loadQuestion(currentQ);
   } else {
-    showResults();
+    var score = countCorrect(userAnswers);
+    hideElement("lblQ");
+    hideElement("imgBlock");
+    hideElement("btnA");
+    hideElement("btnB");
+    hideElement("lblScore");
+    setText("lblResult", "You got " + score + " / " + questions.length + "!\n" +
+      (score === 3 ? "Perfect! Minecraft master!" : score === 2 ? "Nice work!" : "Keep practicing!"));
+    showElement("lblResult");
+    showElement("btnRestart");
   }
 }
 
-// ---- Show final results (OUTPUT) ----
-function showResults() {
-  hideElement("imgBlock");
-  hideElement("btnA");
-  hideElement("btnB");
-  hideElement("btnC");
-  hideElement("btnD");
-  hideElement("lblScoreBar");
-  hideElement("lblProgress");
-
-  var score = countCorrect(userAnswers);
-  setText("lblFinalScore", "You got " + score + " out of " + questions.length + " correct!");
-
-  if (score === 5) {
-    setText("lblFeedback", "Perfect score! You are a Minecraft master!");
-  } else if (score >= 3) {
-    setText("lblFeedback", "Nice work! You know your blocks!");
-  } else {
-    setText("lblFeedback", "Keep practicing! Try again!");
-  }
-
-  showElement("lblFinalScore");
-  showElement("lblFeedback");
-  showElement("btnRestart");
-}
-
-// ---- Entry point ----
-// getKeyValue checks if UI was already built in a previous run.
-// If yes, skip createUI so no "already exists" warnings ever appear.
 getKeyValue("quizUIBuilt", function(val) {
-  if (!val) {
-    createUI();
-    setKeyValue("quizUIBuilt", true, function() {});
-  }
+  if (!val) { createUI(); setKeyValue("quizUIBuilt", true, function() {}); }
   resetAndStart();
 });
