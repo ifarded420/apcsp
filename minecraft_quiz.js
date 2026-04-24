@@ -60,9 +60,17 @@ function countCorrect(answerList) {
   return score;
 }
 
-// ---- Build UI with App Lab functions ----
-// NOTE: "already exists" warnings below only appear on re-runs because
-// App Lab keeps elements alive between runs. They are harmless.
+// ---- Wipe any elements left over from a previous run ----
+// On first run these warn (elements don't exist yet) — harmless.
+// On every run after that, elements exist and delete cleanly — no warnings.
+var allIds = ["lblTitle", "lblProgress", "imgBlock",
+              "btnA", "btnB", "btnC", "btnD",
+              "lblScoreBar", "lblFinalScore", "lblFeedback", "btnRestart"];
+for (var d = 0; d < allIds.length; d++) {
+  deleteElement(allIds[d]);
+}
+
+// ---- Build UI fresh ----
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
 setPosition("lblTitle", 0, 10, 320, 25);
@@ -74,7 +82,7 @@ setPosition("lblProgress", 0, 40, 320, 20);
 setProperty("lblProgress", "font-size", 11);
 setProperty("lblProgress", "text-align", "center");
 
-// Create imgBlock once here; loadQuestion() updates the URL by re-calling image()
+// imgBlock placeholder — loadQuestion() deletes and recreates it with the real URL
 image("imgBlock", "");
 setPosition("imgBlock", 80, 65, 160, 160);
 
@@ -117,8 +125,10 @@ function loadQuestion(qIndex) {
   var q = questions[qIndex];
   setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
 
-  // Update the block image URL using setProperty
-  setProperty("imgBlock", "src", q.imgUrl);
+  // Delete and recreate image — only reliable way to change the URL in App Lab
+  deleteElement("imgBlock");
+  image("imgBlock", q.imgUrl);
+  setPosition("imgBlock", 80, 65, 160, 160);
 
   setText("btnA", q.choices[0]);
   setText("btnB", q.choices[1]);
