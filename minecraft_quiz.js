@@ -25,12 +25,9 @@ function countCorrect(answerList) {
   return score;
 }
 
-// Delete leftovers from any previous run, then rebuild fresh.
-// First run: warns elements don't exist (harmless). Every run after: clean.
+// btnA, btnB, imgBlock are Design Mode elements — not generated here.
+// Only generate the text labels and restart button.
 deleteElement("lblQ");
-deleteElement("imgBlock");
-deleteElement("btnA");
-deleteElement("btnB");
 deleteElement("lblScore");
 deleteElement("lblResult");
 deleteElement("btnRestart");
@@ -39,15 +36,6 @@ textLabel("lblQ", "");
 setPosition("lblQ", 0, 10, 320, 20);
 setProperty("lblQ", "font-size", 11);
 setProperty("lblQ", "text-align", "center");
-
-image("imgBlock", "");
-setPosition("imgBlock", 80, 35, 160, 160);
-
-button("btnA", "");
-setPosition("btnA", 10, 205, 145, 50);
-
-button("btnB", "");
-setPosition("btnB", 165, 205, 145, 50);
 
 textLabel("lblScore", "");
 setPosition("lblScore", 0, 265, 320, 20);
@@ -67,9 +55,7 @@ hideElement("btnRestart");
 function loadQuestion(i) {
   var q = questions[i];
   setText("lblQ", "Q" + (i+1) + " of " + questions.length + ": What block is this?");
-  deleteElement("imgBlock");
-  image("imgBlock", q.imgUrl);
-  setPosition("imgBlock", 80, 35, 160, 160);
+  setProperty("imgBlock", "image-url", q.imgUrl);
   setText("btnA", q.choices[0]);
   setText("btnB", q.choices[1]);
   setText("lblScore", "Score: " + countCorrect(userAnswers) + " / " + questions.length);
@@ -95,8 +81,8 @@ onEvent("btnA", "click", function() { handleAnswer(0); });
 onEvent("btnB", "click", function() { handleAnswer(1); });
 onEvent("btnRestart", "click", function() {
   currentQ = 0; userAnswers = [];
-  showElement("lblQ"); showElement("btnA");
-  showElement("btnB"); showElement("lblScore");
+  showElement("lblQ"); showElement("imgBlock");
+  showElement("btnA"); showElement("btnB"); showElement("lblScore");
   hideElement("lblResult"); hideElement("btnRestart");
   loadQuestion(0);
 });
