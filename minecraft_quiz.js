@@ -62,24 +62,18 @@ function countCorrect(answerList) {
 
 // ---- Build UI with App Lab functions ----
 
-// Title
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
 setPosition("lblTitle", 0, 10, 320, 25);
-setProperty("lblTitle", "font-size", "14px");
+setProperty("lblTitle", "font-size", 14);
 setProperty("lblTitle", "text-align", "center");
-setProperty("lblTitle", "font-weight", "bold");
 
-// Progress line
 textLabel("lblProgress", "");
 setPosition("lblProgress", 0, 40, 320, 20);
-setProperty("lblProgress", "font-size", "11px");
+setProperty("lblProgress", "font-size", 11);
 setProperty("lblProgress", "text-align", "center");
 
-// Block image (OUTPUT)
-image("imgBlock", "");
-setPosition("imgBlock", 80, 65, 160, 160);
+// imgBlock is created fresh each question inside loadQuestion()
 
-// Answer buttons (INPUT) — 2x2 grid
 button("btnA", "");
 setPosition("btnA", 10, 235, 145, 50);
 
@@ -92,23 +86,21 @@ setPosition("btnC", 10, 295, 145, 50);
 button("btnD", "");
 setPosition("btnD", 165, 295, 145, 50);
 
-// Running score bar
 textLabel("lblScoreBar", "Score: 0 / 5");
 setPosition("lblScoreBar", 0, 355, 320, 20);
-setProperty("lblScoreBar", "font-size", "11px");
+setProperty("lblScoreBar", "font-size", 11);
 setProperty("lblScoreBar", "text-align", "center");
 
 // ---- Results elements (hidden until quiz ends) ----
 textLabel("lblFinalScore", "");
 setPosition("lblFinalScore", 0, 130, 320, 40);
-setProperty("lblFinalScore", "font-size", "13px");
+setProperty("lblFinalScore", "font-size", 13);
 setProperty("lblFinalScore", "text-align", "center");
-setProperty("lblFinalScore", "font-weight", "bold");
 hideElement("lblFinalScore");
 
 textLabel("lblFeedback", "");
 setPosition("lblFeedback", 0, 185, 320, 50);
-setProperty("lblFeedback", "font-size", "11px");
+setProperty("lblFeedback", "font-size", 11);
 setProperty("lblFeedback", "text-align", "center");
 hideElement("lblFeedback");
 
@@ -119,8 +111,13 @@ hideElement("btnRestart");
 // ---- Load a question onto the screen ----
 function loadQuestion(qIndex) {
   var q = questions[qIndex];
-  setText("lblProgress", "Question " + (qIndex + 1) + " of " + questions.length + " — " + q.question);
-  setProperty("imgBlock", "image-url", q.imgUrl);
+  setText("lblProgress", "Q" + (qIndex + 1) + " of " + questions.length + ": " + q.question);
+
+  // Delete and recreate the image so the URL updates correctly
+  deleteElement("imgBlock");
+  image("imgBlock", q.imgUrl);
+  setPosition("imgBlock", 80, 65, 160, 160);
+
   setText("btnA", q.choices[0]);
   setText("btnB", q.choices[1]);
   setText("btnC", q.choices[2]);
@@ -130,7 +127,7 @@ function loadQuestion(qIndex) {
 
 // ---- Handle an answer button click (INPUT) ----
 function handleAnswer(choiceIndex) {
-  userAnswers.push(choiceIndex);  // add choice to list
+  userAnswers.push(choiceIndex);  // add to list
   currentQ = currentQ + 1;
   if (currentQ < questions.length) {
     loadQuestion(currentQ);
@@ -141,7 +138,6 @@ function handleAnswer(choiceIndex) {
 
 // ---- Show final results (OUTPUT) ----
 function showResults() {
-  // Hide quiz elements
   hideElement("imgBlock");
   hideElement("btnA");
   hideElement("btnB");
@@ -150,7 +146,6 @@ function showResults() {
   hideElement("lblScoreBar");
   hideElement("lblProgress");
 
-  // Show results elements
   var score = countCorrect(userAnswers);
   setText("lblFinalScore", "You got " + score + " out of " + questions.length + " correct!");
 
@@ -176,7 +171,6 @@ onEvent("btnD", "click", function() { handleAnswer(3); });
 onEvent("btnRestart", "click", function() {
   currentQ    = 0;
   userAnswers = [];
-  showElement("imgBlock");
   showElement("btnA");
   showElement("btnB");
   showElement("btnC");
