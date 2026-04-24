@@ -60,6 +60,19 @@ function countCorrect(answerList) {
   return score;
 }
 
+// ---- Clear any leftover elements from a previous run ----
+deleteElement("lblTitle");
+deleteElement("lblProgress");
+deleteElement("imgBlock");
+deleteElement("btnA");
+deleteElement("btnB");
+deleteElement("btnC");
+deleteElement("btnD");
+deleteElement("lblScoreBar");
+deleteElement("lblFinalScore");
+deleteElement("lblFeedback");
+deleteElement("btnRestart");
+
 // ---- Build UI with App Lab functions ----
 
 textLabel("lblTitle", "MINECRAFT BLOCK QUIZ");
