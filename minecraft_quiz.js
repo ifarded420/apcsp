@@ -63,4 +63,6 @@ onEvent("btnRestart", "click", function() {
   loadQuestion(0);
 });
 
+hideElement("lblResult");
+hideElement("btnRestart");
 loadQuestion(0);
