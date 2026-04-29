@@ -1,7 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Minecraft Block Quiz</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Minecraft Block Quiz</title>
+  <style>
+    /* ---- page layout ---- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1c1c1c;
+      color: #f0f0f0;
+      font-family: "Courier New", monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .screen { display: none; text-align: center; padding: 24px; max-width: 420px; width: 100%; }
+    .screen.active { display: block; }
+
+    h1 { color: #5ece3f; font-size: 1.8rem; margin-bottom: 8px; letter-spacing: 1px; }
+    h2 { color: #5ece3f; font-size: 1.4rem; margin-bottom: 12px; }
+    p  { margin-bottom: 12px; font-size: 0.95rem; color: #ccc; }
+
+    /* ---- Minecraft-style block image ---- */
+    #blockImage {
+      width: 160px;
+      height: 160px;
+      image-rendering: pixelated;
+      border: 4px solid #5ece3f;
+      background: #333;
+      margin: 12px auto;
+      display: block;
+    }
+
+    /* ---- buttons ---- */
+    button {
+      background: #5ece3f;
+      border: 3px solid #3a8a25;
+      color: #1c1c1c;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+      font-weight: bold;
+      padding: 10px 14px;
+      margin: 5px auto;
+      cursor: pointer;
+      display: block;
+      width: 260px;
+      text-align: left;
+    }
+    button:hover { background: #74e254; }
+
+    #startBtn, #playAgainBtn { text-align: center; font-size: 1rem; }
+
+    /* ---- progress + score bar ---- */
+    #progressLabel { color: #aaa; font-size: 0.85rem; margin-bottom: 4px; }
+    #scoreLabel    { color: #5ece3f; font-size: 0.9rem; margin-top: 10px; }
+
+    /* ---- result screen ---- */
+    #resultText { font-size: 1.1rem; margin: 16px 0; color: #f0f0f0; }
+  </style>
+</head>
 <body>
-<script src="minecraft_quiz.js"></script>
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="startScreen" class="screen active">
+    <h1>⛏ Minecraft Block Quiz</h1>
+    <p>Can you identify these blocks?<br>2 questions. Good luck!</p>
+    <button id="startBtn">▶  Start Quiz</button>
+  </div>
+
+  <!-- ===== QUIZ SCREEN ===== -->
+  <div id="quizScreen" class="screen">
+    <p id="progressLabel">Question 1 of 2</p>
+    <p id="questionLabel">What type of Minecraft block is this?</p>
+
+    <!-- Block image (output) -->
+    <img id="blockImage" src="" alt="Minecraft block">
+
+    <!-- Answer buttons (input) -->
+    <div id="choicesDiv">
+      <button class="choiceBtn" id="c0"></button>
+      <button class="choiceBtn" id="c1"></button>
+      <button class="choiceBtn" id="c2"></button>
+      <button class="choiceBtn" id="c3"></button>
+    </div>
+
+    <p id="scoreLabel">Score: 0 / 2</p>
+  </div>
+
+  <!-- ===== RESULTS SCREEN ===== -->
+  <div id="resultsScreen" class="screen">
+    <h2>Quiz Complete!</h2>
+    <p id="resultText"></p>
+    <button id="playAgainBtn">↺  Play Again</button>
+  </div>
+
+  <!-- ============================================================
+       MINECRAFT BLOCK QUIZ — AP CSP Survival Guide
+       Block textures from InventivetalentDev/minecraft-assets (GitHub, MIT License)
+       Source: https://github.com/InventivetalentDev/minecraft-assets
+       Images NOT created by the student.
+  ============================================================ -->
+  <script>
+    // Base URL for block textures (cited above — not student-created)
+    var BASE = "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.20.4/assets/minecraft/textures/block/";
+
+    // ---- LIST OF INFORMATION (APCSP requirement) ----
+    // Each question stores the image file, 4 choices, and the correct choice index
+    var questions = [
+      {
+        img:     BASE + "oak_planks.png",
+        choices: ["Oak Log", "Oak Planks", "Spruce Planks", "Oak Stairs"],
+        correct: 1   // "Oak Planks"
+      },
+      {
+        img:     BASE + "cobblestone.png",
+        choices: ["Stone", "Andesite", "Cobblestone", "Granite"],
+        correct: 2   // "Cobblestone"
+      }
+    ];
+
+    var currentQ   = 0;
+    var userAnswers = [];   // stores the choice index the player picked each round
+
+    // ---- REQUIRED FUNCTION: has a parameter, an if-statement, and a loop ----
+    // parameter: answerList (the list of player picks)
+    function countCorrect(answerList) {
+      var score = 0;
+      // loop (for loop — APCSP requirement)
+      for (var i = 0; i < answerList.length; i++) {
+        // if-statement (APCSP requirement)
+        if (answerList[i] === questions[i].correct) {
+          score = score + 1;
+        }
+      }
+      return score;
+    }
+
+    // ---- HELPER: swap which screen is visible ----
+    function showScreen(id) {
+      var screens = document.querySelectorAll(".screen");
+      for (var i = 0; i < screens.length; i++) {
+        screens[i].classList.remove("active");
+      }
+      document.getElementById(id).classList.add("active");
+    }
+
+    // ---- HELPER: populate the quiz screen with question data ----
+    function loadQuestion(index) {
+      var q = questions[index];
+
+      // Output — update the image and progress text
+      document.getElementById("progressLabel").textContent =
+        "Question " + (index + 1) + " of " + questions.length;
+      document.getElementById("blockImage").src = q.img;
+
+      // Output — update the four choice buttons
+      var btns = document.querySelectorAll(".choiceBtn");
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].textContent = q.choices[i];
+      }
+
+      // Output — live score bar
+      document.getElementById("scoreLabel").textContent =
+        "Score: " + countCorrect(userAnswers) + " / " + questions.length;
+    }
+
+    // ---- EVENT: player clicks an answer button (input) ----
+    function handleAnswer(choiceIndex) {
+      userAnswers.push(choiceIndex);
+      currentQ = currentQ + 1;
+
+      if (currentQ < questions.length) {
+        loadQuestion(currentQ);
+      } else {
+        // All questions answered — show results
+        var finalScore = countCorrect(userAnswers);
+        showScreen("resultsScreen");
+
+        var msg;
+        if (finalScore === questions.length) {
+          msg = "Perfect score — Minecraft master!";
+        } else if (finalScore > 0) {
+          msg = "Nice work! Keep mining!";
+        } else {
+          msg = "Time to play more Minecraft!";
+        }
+        // Output — display final score
+        document.getElementById("resultText").textContent =
+          "You got " + finalScore + " out of " + questions.length + " correct!  " + msg;
+      }
+    }
+
+    // ---- Wire up buttons ----
+
+    // Start button
+    document.getElementById("startBtn").addEventListener("click", function () {
+      currentQ    = 0;
+      userAnswers = [];
+      showScreen("quizScreen");
+      loadQuestion(0);
+    });
+
+    // The four answer-choice buttons
+    var choiceBtns = document.querySelectorAll(".choiceBtn");
+    choiceBtns.forEach(function (btn, index) {
+      btn.addEventListener("click", function () {
+        handleAnswer(index);
+      });
+    });
+
+    // Play-again button
+    document.getElementById("playAgainBtn").addEventListener("click", function () {
+      showScreen("startScreen");
+    });
+  </script>
 </body>
 </html>
